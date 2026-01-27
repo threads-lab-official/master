@@ -29,7 +29,7 @@
     <div id="modal" class="fixed inset-0 bg-black/90 hidden flex items-center justify-center p-4 z-[200]">
         <div class="bg-white rounded-[40px] w-full max-w-xl p-10 text-center">
             <textarea id="res" class="w-full h-[300px] p-6 bg-gray-50 rounded-[30px] mb-6 outline-none font-bold" readonly></textarea>
-            <button onclick="copy()" class="w-full bg-black text-white font-black py-6 rounded-[30px] mb-4">コピーしてAIに貼る</button>
+            <button onclick="copy()" class="w-full bg-black text-white font-black py-6 rounded-[30px] mb-4">コピーする</button>
             <button onclick="document.getElementById('modal').classList.add('hidden')" class="text-gray-400">閉じる</button>
         </div>
     </div>
@@ -42,7 +42,13 @@
             MASTER_DATA[type].forEach(s => {
                 const div = document.createElement('div');
                 div.className = "bg-white p-8 rounded-[40px] border border-gray-100 shadow-sm mb-6";
-                div.innerHTML = `<h3 class="font-black text-2xl mb-6">${s.name}</h3><div class="space-y-4">${s.inputs.map(i => `<input type="text" data-key="${i}" placeholder="${i}を入力" class="w-full bg-gray-50 p-5 rounded-3xl outline-none font-bold focus:ring-2 focus:ring-black">`).join('')}<button onclick="gen('${type}',${s.id})" class="w-full bg-black text-white py-5 rounded-3xl font-bold mt-4">プロンプトを生成</button></div>`;
+                div.innerHTML = `
+                    <h3 class="font-black text-2xl mb-2">${s.name}</h3>
+                    <div class="text-xs text-gray-500 mb-6 bg-gray-50 p-5 rounded-3xl whitespace-pre-wrap leading-relaxed border border-gray-100">${s.desc}</div>
+                    <div class="space-y-4">
+                        ${s.inputs.map(i => `<input type="text" data-key="${i}" placeholder="${i}を入力" class="w-full bg-gray-50 p-5 rounded-3xl outline-none font-bold focus:ring-2 focus:ring-black">`).join('')}
+                        <button onclick="gen('${type}',${s.id})" class="w-full bg-black text-white py-5 rounded-3xl font-bold mt-4">プロンプトを生成</button>
+                    </div>`;
                 container.appendChild(div);
             });
             document.getElementById('view-main').classList.add('hidden');
