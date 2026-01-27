@@ -1,0 +1,126 @@
+/* 極上のデザイン設定 */
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;700;800&family=Noto+Sans+JP:wght@400;700&display=swap');
+
+:root {
+    --bg: #000000;
+    --card: #121212;
+    --accent: linear-gradient(135deg, #FF0080 0%, #7928CA 100%);
+    --text: #ffffff;
+    --text-dim: #a0a0a0;
+    --border: #2a2a2a;
+}
+
+body {
+    background-color: var(--bg);
+    color: var(--text);
+    font-family: 'Inter', 'Noto Sans JP', sans-serif;
+    margin: 0;
+}
+
+.app-container {
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 60px 20px;
+}
+
+header h1 {
+    text-align: center;
+    font-size: 3rem;
+    font-weight: 800;
+    letter-spacing: -2px;
+    margin-bottom: 40px;
+    background: var(--accent);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+}
+
+/* タブをThreads風に */
+.category-tabs {
+    display: flex;
+    justify-content: center;
+    gap: 12px;
+    margin-bottom: 40px;
+}
+
+.tab-btn {
+    background: #1e1e1e;
+    border: 1px solid var(--border);
+    color: var(--text-dim);
+    padding: 12px 28px;
+    border-radius: 100px;
+    cursor: pointer;
+    font-weight: 600;
+    transition: 0.2s;
+}
+
+.tab-btn.active {
+    background: #fff;
+    color: #000;
+}
+
+/* レイアウト */
+.main-content {
+    display: grid;
+    grid-template-columns: 320px 1fr;
+    gap: 24px;
+}
+
+.sidebar, .editor {
+    background: var(--card);
+    border: 1px solid var(--border);
+    border-radius: 24px;
+    padding: 30px;
+}
+
+.list-item {
+    padding: 14px;
+    margin-bottom: 8px;
+    border-radius: 12px;
+    cursor: pointer;
+    transition: 0.2s;
+    border: 1px solid transparent;
+}
+
+.list-item:hover {
+    background: #1e1e1e;
+    border-color: #444;
+}
+
+textarea {
+    width: 100%;
+    background: #080808;
+    border: 1px solid var(--border);
+    border-radius: 16px;
+    color: #fff;
+    padding: 20px;
+    font-size: 1rem;
+    margin-bottom: 20px;
+    box-sizing: border-box;
+}
+
+.generate-btn {
+    width: 100%;
+    padding: 20px;
+    background: var(--accent);
+    border: none;
+    border-radius: 16px;
+    color: #fff;
+    font-size: 1.1rem;
+    font-weight: 800;
+    cursor: pointer;
+    transition: 0.3s;
+}
+
+.generate-btn:hover {
+    transform: scale(1.02);
+}
+
+.copy-btn {
+    background: #fff;
+    color: #000;
+    border: none;
+    padding: 12px 24px;
+    border-radius: 8px;
+    font-weight: 700;
+    cursor: pointer;
+}
