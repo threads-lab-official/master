@@ -1,0 +1,64 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Threads Master Pro</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        body { font-family: sans-serif; background-color: #fff; -webkit-tap-highlight-color: transparent; }
+        .hidden { display: none !important; }
+    </style>
+</head>
+<body class="text-gray-900 overflow-x-hidden text-center">
+    <div id="login-screen" class="fixed inset-0 bg-white z-[100] flex flex-col items-center justify-center p-8">
+        <h1 class="text-6xl font-black mb-12 italic">THREADS</h1>
+        <input type="password" id="pw-input" placeholder="Password" class="w-full max-w-xs bg-gray-100 p-6 rounded-[30px] text-center outline-none font-bold text-xl mb-4">
+        <button onclick="checkPw()" class="w-full max-w-xs bg-black text-white font-black py-6 rounded-[30px]">ログイン</button>
+    </div>
+    <div id="main-app" class="hidden max-w-2xl mx-auto px-6 py-10 text-left">
+        <h1 class="text-2xl font-black italic mb-10">🧵 Assist Pro</h1>
+        <div id="view-main" class="grid grid-cols-1 gap-5">
+            <button onclick="render('buzz')" class="bg-black text-white p-12 rounded-[50px] text-3xl font-bold italic text-left shadow-2xl">バズ構文</button>
+            <button onclick="render('long')" class="bg-white text-black p-12 rounded-[50px] text-3xl font-bold italic text-left border border-gray-100 shadow-sm">長文投稿</button>
+        </div>
+        <div id="view-list" class="hidden space-y-6">
+            <button onclick="location.reload()" class="text-gray-400 font-bold">← 戻る</button>
+            <div id="items" class="space-y-10 pb-32"></div>
+        </div>
+    </div>
+    <div id="modal" class="fixed inset-0 bg-black/90 hidden flex items-center justify-center p-4 z-[200]">
+        <div class="bg-white rounded-[40px] w-full max-w-xl p-10 text-center">
+            <textarea id="res" class="w-full h-[300px] p-6 bg-gray-50 rounded-[30px] mb-6 outline-none font-bold" readonly></textarea>
+            <button onclick="copy()" class="w-full bg-black text-white font-black py-6 rounded-[30px] mb-4">コピーしてAIに貼る</button>
+            <button onclick="document.getElementById('modal').classList.add('hidden')" class="text-gray-400">閉じる</button>
+        </div>
+    </div>
+    <script src="data.js"></script>
+    <script>
+        function checkPw(){ if(document.getElementById('pw-input').value==='mikann'){document.getElementById('login-screen').style.display='none';document.getElementById('main-app').classList.remove('hidden');}}
+        function render(type){
+            const container = document.getElementById('items');
+            container.innerHTML = `<h2 class="text-3xl font-black italic mb-10 text-center uppercase">${type}</h2>`;
+            MASTER_DATA[type].forEach(s => {
+                const div = document.createElement('div');
+                div.className = "bg-white p-8 rounded-[40px] border border-gray-100 shadow-sm mb-6";
+                div.innerHTML = `<h3 class="font-black text-2xl mb-6">${s.name}</h3><div class="space-y-4">${s.inputs.map(i => `<input type="text" data-key="${i}" placeholder="${i}を入力" class="w-full bg-gray-50 p-5 rounded-3xl outline-none font-bold focus:ring-2 focus:ring-black">`).join('')}<button onclick="gen('${type}',${s.id})" class="w-full bg-black text-white py-5 rounded-3xl font-bold mt-4">プロンプトを生成</button></div>`;
+                container.appendChild(div);
+            });
+            document.getElementById('view-main').classList.add('hidden');
+            document.getElementById('view-list').classList.remove('hidden');
+            window.scrollTo(0,0);
+        }
+        function gen(type,id){
+            const s = MASTER_DATA[type].find(x => x.id === id);
+            const container = event.target.closest('div');
+            const inputs = container.querySelectorAll('input');
+            let res = s.template;
+            inputs.forEach(i => { res = res.replace(new RegExp('\\{'+i.getAttribute('data-key')+'\\}','g'), i.value || "未入力"); });
+            document.getElementById('res').value = res;
+            document.getElementById('modal').classList.remove('hidden');
+        }
+        function copy(){const r=document.getElementById('res');r.select();document.execCommand('copy');alert('コピーしました！');}
+    </script>
+</body>
+</html>
