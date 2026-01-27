@@ -35,36 +35,30 @@ function selectItem(item) {
 
     const genBtn = document.getElementById('generateBtn');
     genBtn.style.display = 'block';
-    genBtn.onclick = () => assembleFinalPrompt(item);
+    genBtn.onclick = () => assemblePrompt(item);
 }
 
-// ここがあなたの求めていた「黄金の並び順」
-function assembleFinalPrompt(item) {
-    let output = "";
+// ここがあなたの求めていた「正しい組み立て順序」です
+function assemblePrompt(item) {
+    let final = "";
     
-    // 1. 説明
-    output += `【説明】\n${item.explanation}\n\n`;
-    // 2. 冒頭フック例
-    output += `【冒頭フック例】\n${item.hooks}\n\n`;
-    // 3. 投稿テンプレート構成
-    output += `【投稿テンプレート構成】\n${item.composition}\n\n`;
-    // 4. 具体的な流れ
-    output += `【具体的な流れ】\n${item.flow}\n\n`;
-    // 5. ポイント・コツ
-    output += `【ポイント・コツ】\n${item.tips}\n\n`;
+    final += `【説明】\n${item.explanation}\n\n`;
+    final += `【冒頭フック例】\n${item.hook_examples}\n\n`;
+    final += `【投稿テンプレート構成】\n${item.composition}\n\n`;
+    final += `【具体的な流れ】\n${item.flow}\n\n`;
+    final += `【ポイント・コツ】\n${item.tips}\n\n`;
     
-    // 6. ユーザーの入力内容
-    output += `--- ユーザー入力内容 ---\n`;
+    final += `--- ユーザー入力 ---\n`;
     item.inputs.forEach(inputName => {
         const val = document.getElementById(`input-${inputName}`).value;
-        output += `【${inputName}】: ${val}\n`;
+        final += `【${inputName}】：${val}\n`;
     });
+    
+    // 一番最後に、あの長いプロンプト（AIへの役割指示とルール）を置く
+    final += `\n--- AIへの指示 ---\n`;
+    final += item.prompt_main;
 
-    // 7. プロンプト（AIへの長い指示）を最後に！
-    output += `\n--- AIへの最終指示 ---\n`;
-    output += item.ai_prompt;
-
-    document.getElementById('resultText').value = output;
+    document.getElementById('resultText').value = final;
 }
 
 function clearEditor() {
@@ -80,7 +74,7 @@ document.getElementById('copyBtn').onclick = () => {
     if(!text.value) return;
     text.select();
     document.execCommand('copy');
-    alert('コピーしました！AIに貼り付けてください。');
+    alert('プロンプトをコピーしました！');
 };
 
 window.onload = () => renderList();
