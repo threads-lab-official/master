@@ -842,5 +842,4 @@ const MASTER_DATA = {
         }
     ],
     long: []
-    ]
 };
