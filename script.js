@@ -35,30 +35,31 @@ function selectItem(item) {
 
     const genBtn = document.getElementById('generateBtn');
     genBtn.style.display = 'block';
-    genBtn.onclick = () => assemblePrompt(item);
+    genBtn.onclick = () => buildFinalPrompt(item);
 }
 
-// ここがあなたの求めていた「正しい組み立て順序」です
-function assemblePrompt(item) {
-    let final = "";
+// ここで9項目を「正しい順序」で合体させます
+function buildFinalPrompt(item) {
+    let output = "";
     
-    final += `【説明】\n${item.explanation}\n\n`;
-    final += `【冒頭フック例】\n${item.hook_examples}\n\n`;
-    final += `【投稿テンプレート構成】\n${item.composition}\n\n`;
-    final += `【具体的な流れ】\n${item.flow}\n\n`;
-    final += `【ポイント・コツ】\n${item.tips}\n\n`;
+    output += `【説明】\n${item.explanation}\n\n`;
+    output += `【重要度】\n${item.importance}\n\n`;
+    output += `【冒頭フック例】\n${item.hook_examples}\n\n`;
+    output += `【投稿テンプレート構成】\n${item.composition}\n\n`;
+    output += `【具体的な流れ】\n${item.flow}\n\n`;
+    output += `【ポイント・コツ】\n${item.tips}\n\n`;
     
-    final += `--- ユーザー入力 ---\n`;
+    output += `--- ユーザー入力情報 ---\n`;
     item.inputs.forEach(inputName => {
         const val = document.getElementById(`input-${inputName}`).value;
-        final += `【${inputName}】：${val}\n`;
+        output += `【${inputName}】: ${val}\n`;
     });
-    
-    // 一番最後に、あの長いプロンプト（AIへの役割指示とルール）を置く
-    final += `\n--- AIへの指示 ---\n`;
-    final += item.prompt_main;
 
-    document.getElementById('resultText').value = final;
+    // 指示通り、AIへの「プロンプト」を一番最後に配置します
+    output += `\n--- 最終プロンプト指示 ---\n`;
+    output += item.prompt_main;
+
+    document.getElementById('resultText').value = output;
 }
 
 function clearEditor() {
@@ -74,7 +75,7 @@ document.getElementById('copyBtn').onclick = () => {
     if(!text.value) return;
     text.select();
     document.execCommand('copy');
-    alert('プロンプトをコピーしました！');
+    alert('プロンプトを完全にコピーしました！');
 };
 
 window.onload = () => renderList();
