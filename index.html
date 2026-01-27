@@ -3,44 +3,54 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Threads Master Pro</title>
+    <title>Threads Master Pro | 究極の投稿生成ツール</title>
     <link rel="stylesheet" href="style.css">
+    <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+JP:wght@400;700&display=swap" rel="stylesheet">
 </head>
 <body>
-    <div class="container">
-        <h1>Threads Master Pro</h1>
+    <div class="app-container">
+        <header>
+            <h1>Threads Master <span>Pro</span></h1>
+            <p>バズを科学し、滞在時間を支配する</p>
+        </header>
         
-        <div class="tab-container">
-            <button class="tab-btn active" onclick="switchCategory('buzz')">バズ構文</button>
-            <button class="tab-btn" onclick="switchCategory('long')">長文投稿</button>
-            <button class="tab-btn" onclick="switchCategory('rewrite')">リライト</button>
-            <button class="tab-btn" onclick="switchCategory('affiliate')">アフィリエイト</button>
-        </div>
+        <nav class="category-tabs">
+            <button class="tab-btn active" onclick="switchCategory('buzz')">🚀 バズ構文</button>
+            <button class="tab-btn" onclick="switchCategory('long')">📄 長文投稿</button>
+            <button class="tab-btn" onclick="switchCategory('rewrite')">♻️ リライト</button>
+            <button class="tab-btn" onclick="switchCategory('affiliate')">💰 アフィリ</button>
+        </nav>
 
-        <div class="main-layout">
-            <div class="list-section">
+        <main class="main-content">
+            <aside class="sidebar">
+                <div class="list-header">構文を選択</div>
                 <div id="itemList" class="item-list"></div>
-            </div>
+            </aside>
 
-            <div class="editor-section">
-                <div id="selectedItemInfo" class="selected-info">
-                    <h2 id="selectedName">項目を選択してください</h2>
-                    <p id="selectedDesc"></p>
+            <section class="editor">
+                <div id="selectedInfo" class="selected-info">
+                    <h2 id="selectedName">← 左のメニューから選択</h2>
+                    <p id="selectedDesc">ターゲットに合わせた最適な構成を選択してください。</p>
                 </div>
 
-                <div id="inputForm" class="input-form"></div>
+                <div id="inputForm" class="input-form">
+                    </div>
                 
-                <button id="generateBtn" class="generate-btn" style="display:none;">プロンプトを生成</button>
+                <button id="generateBtn" class="generate-btn" style="display:none;">
+                    ✨ AIプロンプトを生成する
+                </button>
 
-                <div class="result-area">
-                    <textarea id="resultText" readonly placeholder="ここにプロンプトが生成されます..."></textarea>
-                    <button id="copyBtn" class="copy-btn">コピーする</button>
+                <div class="result-container">
+                    <div class="result-header">
+                        <span>生成されたプロンプト</span>
+                        <button id="copyBtn" class="copy-btn">📋 コピペする</button>
+                    </div>
+                    <textarea id="resultText" readonly placeholder="生成されたプロンプトがここに表示されます..."></textarea>
                 </div>
-            </div>
-        </div>
+            </section>
+        </main>
     </div>
 
-    
     <script src="data.js"></script>
     <script src="buzz.js"></script>
     <script src="long.js"></script>
