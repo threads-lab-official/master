@@ -1,1 +1,242 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <title>Threads Master 29</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        body { background-color: #000; color: #fff; font-family: sans-serif; }
+        .card { transition: all 0.3s ease; border: 1px solid #222; }
+        .card:hover { border-color: #fff; transform: translateY(-5px); background: #111; }
+        input, textarea { background: #0a0a0a !important; color: #fff !important; border: 1px solid #333 !important; }
+        input:focus { border-color: #fff !important; outline: none; }
+        ::-webkit-scrollbar { width: 0px; }
+    </style>
+</head>
+<body class="flex items-center justify-center min-h-screen">
 
+<div id="main-menu" class="grid grid-cols-1 md:grid-cols-3 gap-8 w-full max-w-5xl p-6">
+    <div onclick="showCategory('buzz')" class="card bg-zinc-950 p-16 rounded-[40px] cursor-pointer text-center">
+        <div class="text-5xl mb-6">🚀</div>
+        <h2 class="text-3xl font-black italic tracking-tighter">バズ構文</h2>
+    </div>
+    <div onclick="showCategory('long')" class="card bg-zinc-950 p-16 rounded-[40px] cursor-pointer text-center">
+        <div class="text-5xl mb-6">📜</div>
+        <h2 class="text-3xl font-black italic tracking-tighter">長文投稿</h2>
+    </div>
+    <div onclick="showCategory('rewrite')" class="card bg-zinc-950 p-16 rounded-[40px] cursor-pointer text-center">
+        <div class="text-5xl mb-6">✂️</div>
+        <h2 class="text-3xl font-black italic tracking-tighter">リライト</h2>
+    </div>
+</div>
+
+<div id="list-selection" class="hidden w-full max-w-4xl p-6">
+    <button onclick="goBack('main-menu')" class="text-zinc-500 hover:text-white mb-10 font-bold">← BACK</button>
+    <div id="prompt-grid" class="grid grid-cols-1 md:grid-cols-2 gap-4"></div>
+</div>
+
+<div id="editor" class="hidden w-full max-w-2xl bg-zinc-950 p-10 rounded-[40px] border border-zinc-900">
+    <button onclick="goBack('list-selection')" class="text-zinc-500 hover:text-white mb-8 font-bold">← BACK</button>
+    <h2 id="edit-title" class="text-4xl font-black mb-4 italic text-white"></h2>
+    <div id="fields" class="space-y-6"></div>
+    <button onclick="copyFinal()" class="w-full mt-10 bg-white text-black py-6 rounded-3xl font-black text-2xl uppercase tracking-tighter">Copy Prompt</button>
+    <p id="toast" class="text-center mt-6 text-zinc-500 font-bold opacity-0 transition uppercase tracking-widest text-xs">Copied!</p>
+</div>
+
+<script>
+// ★ここから下のデータを、これから一個ずつ埋めていきます！
+const prompts = {
+    buzz: [{
+    id: 1,
+    name: "逆張り・常識破壊型",
+    fields: ["テーマ", "ターゲット"],
+    prompt: `あなたはThreads投稿の専門家です。逆張り・常識破壊型の投稿を作成してください。
+
+【投稿の本質】
+世間の常識を否定→自分も信じていた→失敗した→専門家に聞いた→真実がわかった→解決した、という「常識破壊の体験談」を語る形式。読者に「えっ!?」と思わせ、常識を疑うきっかけを与える。
+
+【含めるべき要素】
+・常識を否定する衝撃的な冒頭
+・「私も◯◯って思ってた」という共感パート
+・実際に試して失敗した具体的エピソード
+・専門家の意見や科学的根拠
+・実際に改善した方法
+・常識を疑う大切さの気づき
+
+【文章のルール】
+- 300-450字
+- 改行で読みやすく
+- 断定的に書く(「〜です」「〜でした」)
+- 具体的な数字を1つ以上含める
+- ストーリー形式で自然に流れる文章
+
+【参考例1:スキンケア】
+「化粧水つけすぎると逆に乾燥するって知ってました?
+私も『保湿=たっぷり化粧水』って信じてて、朝晩500円玉大を3回重ねづけしてたんですよ。
+でも肌の乾燥が全然治らなくて。
+皮膚科の先生に相談したら『水分の過剰摂取で肌のバリア機能が低下してる』って言われました。
+実は肌に必要なのは水分じゃなくて油分。化粧水で水分入れても、蓋をしないと蒸発して逆効果だったんです。
+化粧水を10円玉大にして、クリームをしっかり塗るようにしたら2週間で改善しました。
+常識って正しいと思われがちですが、やりすぎも良くないんですね。」
+
+【参考例2:ダイエット】
+「毎日ジョギングしてるのに痩せない人、実は走りすぎが原因かも。
+私も『有酸素運動=ダイエット』って信じて、毎朝5km走ってたんです。
+でも3ヶ月で体重が0.5kgしか減らなくて。
+トレーナーに相談したら『有酸素運動のやりすぎで筋肉が落ちて、基礎代謝が下がってる』って。
+実は週3回の筋トレの方が、基礎代謝が上がって痩せやすい体になるそうです。
+ジョギングを週2回に減らして筋トレ始めたら、2ヶ月で3kg落ちました。
+常識を疑わないと、努力が無駄になることもあるんだなって痛感しました。」
+
+【参考例3:子育て】
+「子どもに『頑張れ』って言うのは逆効果だって知ってました?
+私も『励まし=頑張れ』って思って、テスト前の息子に毎日言ってたんですよ。
+でもどんどん成績が下がって、勉強嫌いになって。
+スクールカウンセラーに相談したら『頑張れは子どもにプレッシャーを与えるだけ』って言われました。
+実は子どもが求めてるのは励ましじゃなくて共感。『大変だよね』『よく頑張ってるね』の方が安心するそうです。
+声かけを変えたら、1ヶ月後には自分から机に向かうようになりました。
+常識だと思ってることが、実は子どもを追い詰めてたんですね。」
+
+【重要な注意点】
+- 番号や見出し(「1.冒頭フック」など)は絶対に使わないこと
+- 自然な投稿文として完成させる
+- 参考例と全く同じ構成・表現にならないよう、テーマに応じて柔軟に構成する
+- ただし「常識否定→共感→失敗→専門家の意見→解決→気づき」の流れは意識する
+- 必ず読者が「えっ!?」と思う展開を作ること
+
+【テーマ】{テーマ}
+
+【ターゲット】{ターゲット}
+
+上記の要素を自然に含めながら、常識を破壊する体験談型の投稿を作成してください。`
+},{
+    id: 2,
+    name: "賛否両論・極論型",
+    fields: ["テーマ", "ターゲット"],
+    prompt: `あなたはThreads投稿の専門家です。賛否両論を生む極論型の投稿を作成してください。
+
+【投稿の本質】
+極端な主張で読者を二分し、「その通り!」と「ありえない!」の両方の反応を引き出す。古い価値観に疑問を投げかけ、新しい視点を提示することで議論を巻き起こす。バズ=議論が起きている状態を作り出すことが目的。
+
+【含めるべき要素】
+・極端で二分される主張(「◯◯は不要」「◯◯すべき」など断定的な表現)
+・炎上覚悟の姿勢を示す表現(「批判されるの覚悟で言います」「嫌われてもいいから伝えたい」など)
+・従来の価値観がなぜ時代遅れか、または問題があるかの指摘
+・自分が信じる新しい価値観・考え方の提示
+・実際の具体例やエピソード(数字や固有名詞を含める)
+・「価値観は人それぞれだけど、私はこう思う」という締め、または自分の立場の再確認
+
+【表現の特徴】
+・「◯◯は時代遅れ」「もう◯◯の時代じゃない」
+・「古い世代は理解できないかもしれないけど」
+・「◯◯って本当に必要?」「◯◯にお金かける意味ある?」
+・「私たちの世代は◯◯より△△を選ぶ」
+・「正直言って◯◯はコスパ悪い」
+・「みんな◯◯って言うけど、実際は△△でしょ」
+
+【文章のルール】
+- 300-450字
+- 改行で読みやすく、パンチのある文章に
+- 断定的に書く(「〜だと思います」ではなく「〜です」)
+- 具体例に数字や固有名詞を必ず含める
+- ストーリー形式ではなく、主張→理由→具体例の論理展開
+- 読者が「賛成」「反対」どちらかの立場を取りたくなる内容
+
+【参考例1:専業主婦論】
+「専業主婦って正直コスパ悪いと思う。
+批判覚悟で言うけど、年収500万の人が家事のために仕事辞めるって、経済的損失エグい。
+家事代行月10万でも年120万。差額380万どこ行った?
+子どもに『ママは家にいるべき』って刷り込むのも時代遅れ。
+共働き家庭で育った私の方が、お金の使い方も自立心も身についてる。
+うちの母親、専業主婦で父に依存して離婚できずに我慢してた人生だったし。
+価値観は人それぞれだけど、私は絶対働く。」
+
+【参考例2:結婚式論】
+「結婚式に300万かけるの、マジで無駄だと思う。
+嫌われてもいいから言うけど、親族と会社の人呼んで、一生に一度の思い出作りって...その300万で新婚旅行3回行けるよ?
+『けじめ』とか『感謝を伝える場』って言うけど、それ本当に300万の価値ある?
+私の周り、式挙げた夫婦の半分は5年以内に離婚してるんだけど。
+SNS映えのために借金して、その後の生活カツカツって本末転倒。
+入籍だけして、家族で食事会したほうが絶対いい。
+古い世代は理解できないかもしれないけど、これが私たちの価値観。」
+
+【参考例3:マイホーム論】
+「20代で家買うやつ、正直理解できない。
+批判覚悟で言うけど、35年ローンって人生縛られすぎでしょ。
+転勤も転職もできない、子どもの学区も固定、災害リスクも全部背負う。
+『賃貸は家賃の無駄』って言うけど、持ち家も固定資産税、修繕費、金利で結局同じくらいかかるからね。
+私の先輩、家買った直後に会社倒産して、ローン払えず任意売却してた。
+人生何があるかわからないのに、固定費を最大化するって正気?
+賃貸で身軽に生きて、余った金で資産運用したほうが賢いと思う。」
+
+【重要な注意点】
+- 番号や見出し(「1.冒頭フック」など)は絶対に使わないこと
+- 自然な投稿文として完成させる
+- 参考例と全く同じ構成・表現にならないよう、テーマに応じて柔軟に構成する
+- ただし「極論→理由説明→具体例→締め」の流れは意識する
+- 必ず賛否が分かれる内容にすること
+
+【テーマ】{テーマ}
+
+【ターゲット】{ターゲット}
+
+上記の要素を自然に含めながら、読者を二分する極論型の投稿を作成してください。`
+},],    // バズ構文の置き場所
+    long: [],    // 長文投稿の置き場所
+    rewrite: []  // リライトの置き場所
+};
+
+// システム部分（ここはいじらなくてOK）
+let activePrompt = null;
+function showCategory(cat) {
+    document.getElementById('main-menu').classList.add('hidden');
+    document.getElementById('list-selection').classList.remove('hidden');
+    const grid = document.getElementById('prompt-grid');
+    grid.innerHTML = '';
+    prompts[cat].forEach(p => {
+        const item = document.createElement('div');
+        item.className = "p-8 bg-zinc-950 rounded-3xl border border-zinc-900 hover:border-zinc-400 cursor-pointer transition";
+        item.innerHTML = `<span class="font-bold text-lg">${p.name}</span>`;
+        item.onclick = () => openEditor(p);
+        grid.appendChild(item);
+    });
+}
+function openEditor(p) {
+    activePrompt = p;
+    document.getElementById('list-selection').classList.add('hidden');
+    document.getElementById('editor').classList.remove('hidden');
+    document.getElementById('edit-title').innerText = p.name;
+    const fDiv = document.getElementById('fields');
+    fDiv.innerHTML = '';
+    if (p.fields && p.fields.length > 0) {
+        p.fields.forEach(f => {
+            const input = document.createElement('input');
+            input.id = 'input-' + f;
+            input.placeholder = f + 'を入力...';
+            input.className = "w-full p-5 rounded-2xl text-lg mb-4";
+            fDiv.appendChild(input);
+        });
+    }
+}
+function copyFinal() {
+    let text = activePrompt.prompt;
+    if (activePrompt.fields) {
+        activePrompt.fields.forEach(f => {
+            const val = document.getElementById('input-' + f).value || `[${f}]`;
+            text = text.replace(new RegExp(`\\{${f}\\}`, 'g'), val);
+        });
+    }
+    navigator.clipboard.writeText(text);
+    const toast = document.getElementById('toast');
+    toast.style.opacity = '1';
+    setTimeout(() => toast.style.opacity = '0', 2000);
+}
+function goBack(target) {
+    document.getElementById('main-menu').classList.add('hidden');
+    document.getElementById('list-selection').classList.add('hidden');
+    document.getElementById('editor').classList.add('hidden');
+    document.getElementById(target).classList.remove('hidden');
+}
+</script>
+</body>
+</html>
