@@ -2,53 +2,86 @@
 <html lang="ja">
 <head>
     <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Threads Master 29</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <style>
-        body { background-color: #000; color: #fff; font-family: sans-serif; }
-        .card { transition: all 0.3s ease; border: 1px solid #222; }
-        .card:hover { border-color: #fff; transform: translateY(-5px); background: #111; }
-        input, textarea { background: #0a0a0a !important; color: #fff !important; border: 1px solid #333 !important; }
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@900&display=swap');
+        body { background-color: #000; color: #fff; font-family: 'Inter', sans-serif; overflow: hidden; }
+        .font-black-italic { font-weight: 900; font-style: italic; letter-spacing: -0.05em; }
+        .glass-card { background: #0a0a0a; border: 1px solid #1a1a1a; transition: all 0.4s cubic-bezier(0.16, 1, 0.3, 1); }
+        .glass-card:hover { border-color: #fff; background: #111; transform: translateY(-5px); }
+        input { background: #000 !important; color: #fff !important; border: 1px solid #222 !important; text-align: center; }
         input:focus { border-color: #fff !important; outline: none; }
+        .hidden-content { display: none; }
         ::-webkit-scrollbar { width: 0px; }
     </style>
 </head>
 <body class="flex items-center justify-center min-h-screen">
 
-<div id="main-menu" class="grid grid-cols-1 md:grid-cols-3 gap-8 w-full max-w-5xl p-6">
-    <div onclick="showCategory('buzz')" class="card bg-zinc-950 p-16 rounded-[40px] cursor-pointer text-center">
-        <div class="text-5xl mb-6">🚀</div>
-        <h2 class="text-3xl font-black italic tracking-tighter">バズ構文</h2>
+    <div id="auth-screen" class="w-full max-w-sm p-8 text-center">
+        <h1 class="text-2xl font-black-italic mb-8 tracking-widest uppercase">ENTER ACCESS KEY</h1>
+        <input type="password" id="pass-input" class="w-full p-4 rounded-full mb-6 tracking-[0.5em]" placeholder="••••••">
+        <button onclick="checkPass()" class="w-full bg-white text-black py-4 rounded-full font-black uppercase text-sm hover:bg-zinc-200 transition">Unlock</button>
+        <p id="error-msg" class="text-red-600 text-xs mt-4 opacity-0">ACCESS DENIED</p>
     </div>
-    <div onclick="showCategory('long')" class="card bg-zinc-950 p-16 rounded-[40px] cursor-pointer text-center">
-        <div class="text-5xl mb-6">📜</div>
-        <h2 class="text-3xl font-black italic tracking-tighter">長文投稿</h2>
+
+    <div id="main-content" class="hidden-content w-full max-w-6xl p-6">
+        
+        <div id="main-menu" class="grid grid-cols-1 md:grid-cols-3 gap-10">
+            <div onclick="showCategory('buzz')" class="glass-card p-20 rounded-[50px] cursor-pointer group">
+                <div class="text-6xl mb-8 group-hover:scale-110 transition duration-500 text-center">🚀</div>
+                <h2 class="text-4xl font-black-italic text-center uppercase tracking-tighter">BUZZ</h2>
+                <p class="text-zinc-600 text-[10px] text-center mt-4 tracking-[0.3em]">20 STRATEGIES</p>
+            </div>
+            <div onclick="showCategory('long')" class="glass-card p-20 rounded-[50px] cursor-pointer group">
+                <div class="text-6xl mb-8 group-hover:scale-110 transition duration-500 text-center">📜</div>
+                <h2 class="text-4xl font-black-italic text-center uppercase tracking-tighter">LONG</h2>
+                <p class="text-zinc-600 text-[10px] text-center mt-4 tracking-[0.3em]">6 STRATEGIES</p>
+            </div>
+            <div onclick="showCategory('rewrite')" class="glass-card p-20 rounded-[50px] cursor-pointer group">
+                <div class="text-6xl mb-8 group-hover:scale-110 transition duration-500 text-center">✂️</div>
+                <h2 class="text-4xl font-black-italic text-center uppercase tracking-tighter">EDIT</h2>
+                <p class="text-zinc-600 text-[10px] text-center mt-4 tracking-[0.3em]">3 STRATEGIES</p>
+            </div>
+        </div>
+
+        <div id="list-selection" class="hidden w-full max-w-4xl mx-auto">
+            <button onclick="goBack('main-menu')" class="text-zinc-600 hover:text-white mb-12 font-black italic tracking-widest text-xs">← EXIT</button>
+            <div id="prompt-grid" class="grid grid-cols-1 md:grid-cols-2 gap-6"></div>
+        </div>
+
+        <div id="editor" class="hidden w-full max-w-2xl mx-auto glass-card p-12 rounded-[60px]">
+            <button onclick="goBack('list-selection')" class="text-zinc-600 hover:text-white mb-10 font-black italic tracking-widest text-xs">← BACK</button>
+            <h2 id="edit-title" class="text-5xl font-black-italic mb-2 uppercase tracking-tighter"></h2>
+            <p id="edit-desc" class="text-zinc-500 text-xs mb-12 tracking-wider font-bold"></p>
+            <div id="fields" class="space-y-8"></div>
+            <button onclick="copyFinal()" class="w-full mt-14 bg-white text-black py-7 rounded-[30px] font-black text-2xl uppercase tracking-widest hover:bg-zinc-200 transition active:scale-95">Copy & Launch</button>
+            <p id="toast" class="text-center mt-6 text-zinc-500 font-bold opacity-0 transition text-xs tracking-[0.2em]">SUCCESSFULLY COPIED</p>
+        </div>
+
     </div>
-    <div onclick="showCategory('rewrite')" class="card bg-zinc-950 p-16 rounded-[40px] cursor-pointer text-center">
-        <div class="text-5xl mb-6">✂️</div>
-        <h2 class="text-3xl font-black italic tracking-tighter">リライト</h2>
-    </div>
-</div>
 
-<div id="list-selection" class="hidden w-full max-w-4xl p-6">
-    <button onclick="goBack('main-menu')" class="text-zinc-500 hover:text-white mb-10 font-bold">← BACK</button>
-    <div id="prompt-grid" class="grid grid-cols-1 md:grid-cols-2 gap-4"></div>
-</div>
+    <script>
+        const PASS = "mikann";
 
-<div id="editor" class="hidden w-full max-w-2xl bg-zinc-950 p-10 rounded-[40px] border border-zinc-900">
-    <button onclick="goBack('list-selection')" class="text-zinc-500 hover:text-white mb-8 font-bold">← BACK</button>
-    <h2 id="edit-title" class="text-4xl font-black mb-4 italic text-white"></h2>
-    <div id="fields" class="space-y-6"></div>
-    <button onclick="copyFinal()" class="w-full mt-10 bg-white text-black py-6 rounded-3xl font-black text-2xl uppercase tracking-tighter">Copy Prompt</button>
-    <p id="toast" class="text-center mt-6 text-zinc-500 font-bold opacity-0 transition uppercase tracking-widest text-xs">Copied!</p>
-</div>
+        function checkPass() {
+            const input = document.getElementById('pass-input').value;
+            if (input === PASS) {
+                document.getElementById('auth-screen').classList.add('hidden-content');
+                document.getElementById('main-content').classList.remove('hidden-content');
+            } else {
+                const err = document.getElementById('error-msg');
+                err.style.opacity = '1';
+                setTimeout(() => err.style.opacity = '0', 2000);
+            }
+        }
 
-<script>
-// ★ここから下のデータを、これから一個ずつ埋めていきます！
-const prompts = {
-    buzz: [{
+        // ここにデータを追加していきます
+        const prompts = { buzz: [{
     id: 1,
     name: "逆張り・常識破壊型",
+    desc: "世間の常識を否定し、実体験に基づいた衝撃の真実で惹きつける",
     fields: ["テーマ", "ターゲット"],
     prompt: `あなたはThreads投稿の専門家です。逆張り・常識破壊型の投稿を作成してください。
 
@@ -60,8 +93,8 @@ const prompts = {
 ・「私も◯◯って思ってた」という共感パート
 ・実際に試して失敗した具体的エピソード
 ・専門家の意見や科学的根拠
-・実際に改善した方法
-・常識を疑う大切さの気づき
+- 実際に改善した方法
+- 常識を疑う大切さの気づき
 
 【文章のルール】
 - 300-450字
@@ -109,134 +142,71 @@ const prompts = {
 【ターゲット】{ターゲット}
 
 上記の要素を自然に含めながら、常識を破壊する体験談型の投稿を作成してください。`
-},{
-    id: 2,
-    name: "賛否両論・極論型",
-    fields: ["テーマ", "ターゲット"],
-    prompt: `あなたはThreads投稿の専門家です。賛否両論を生む極論型の投稿を作成してください。
+},], long: [], rewrite: [] };
 
-【投稿の本質】
-極端な主張で読者を二分し、「その通り!」と「ありえない!」の両方の反応を引き出す。古い価値観に疑問を投げかけ、新しい視点を提示することで議論を巻き起こす。バズ=議論が起きている状態を作り出すことが目的。
+        let activePrompt = null;
 
-【含めるべき要素】
-・極端で二分される主張(「◯◯は不要」「◯◯すべき」など断定的な表現)
-・炎上覚悟の姿勢を示す表現(「批判されるの覚悟で言います」「嫌われてもいいから伝えたい」など)
-・従来の価値観がなぜ時代遅れか、または問題があるかの指摘
-・自分が信じる新しい価値観・考え方の提示
-・実際の具体例やエピソード(数字や固有名詞を含める)
-・「価値観は人それぞれだけど、私はこう思う」という締め、または自分の立場の再確認
+        function showCategory(cat) {
+            document.getElementById('main-menu').classList.add('hidden-content');
+            document.getElementById('list-selection').classList.remove('hidden');
+            const grid = document.getElementById('prompt-grid');
+            grid.innerHTML = '';
+            prompts[cat].forEach(p => {
+                const item = document.createElement('div');
+                item.className = "p-10 bg-[#050505] rounded-[40px] border border-[#111] hover:border-white cursor-pointer transition flex flex-col justify-center";
+                item.innerHTML = `
+                    <div class="text-zinc-700 text-[10px] font-mono mb-2 uppercase tracking-widest">Type #${p.id}</div>
+                    <div class="font-black text-xl uppercase tracking-tighter mb-1">${p.name}</div>
+                    <div class="text-zinc-500 text-[10px] font-bold uppercase tracking-wider">${p.desc}</div>
+                `;
+                item.onclick = () => openEditor(p);
+                grid.appendChild(item);
+            });
+        }
 
-【表現の特徴】
-・「◯◯は時代遅れ」「もう◯◯の時代じゃない」
-・「古い世代は理解できないかもしれないけど」
-・「◯◯って本当に必要?」「◯◯にお金かける意味ある?」
-・「私たちの世代は◯◯より△△を選ぶ」
-・「正直言って◯◯はコスパ悪い」
-・「みんな◯◯って言うけど、実際は△△でしょ」
+        function openEditor(p) {
+            activePrompt = p;
+            document.getElementById('list-selection').classList.add('hidden');
+            document.getElementById('editor').classList.remove('hidden');
+            document.getElementById('edit-title').innerText = p.name;
+            document.getElementById('edit-desc').innerText = p.desc;
+            const fDiv = document.getElementById('fields');
+            fDiv.innerHTML = '';
+            if (p.fields && p.fields.length > 0) {
+                p.fields.forEach(f => {
+                    const input = document.createElement('input');
+                    input.id = 'input-' + f;
+                    input.placeholder = f.toUpperCase();
+                    input.className = "w-full p-6 rounded-[25px] text-sm tracking-widest font-bold";
+                    fDiv.appendChild(input);
+                });
+            }
+        }
 
-【文章のルール】
-- 300-450字
-- 改行で読みやすく、パンチのある文章に
-- 断定的に書く(「〜だと思います」ではなく「〜です」)
-- 具体例に数字や固有名詞を必ず含める
-- ストーリー形式ではなく、主張→理由→具体例の論理展開
-- 読者が「賛成」「反対」どちらかの立場を取りたくなる内容
+        function copyFinal() {
+            let text = activePrompt.prompt;
+            if (activePrompt.fields) {
+                activePrompt.fields.forEach(f => {
+                    const val = document.getElementById('input-' + f).value || `[${f}]`;
+                    text = text.replace(new RegExp(`\\{${f}\\}`, 'g'), val);
+                });
+            }
+            navigator.clipboard.writeText(text);
+            const toast = document.getElementById('toast');
+            toast.style.opacity = '1';
+            setTimeout(() => toast.style.opacity = '0', 2000);
+        }
 
-【参考例1:専業主婦論】
-「専業主婦って正直コスパ悪いと思う。
-批判覚悟で言うけど、年収500万の人が家事のために仕事辞めるって、経済的損失エグい。
-家事代行月10万でも年120万。差額380万どこ行った?
-子どもに『ママは家にいるべき』って刷り込むのも時代遅れ。
-共働き家庭で育った私の方が、お金の使い方も自立心も身についてる。
-うちの母親、専業主婦で父に依存して離婚できずに我慢してた人生だったし。
-価値観は人それぞれだけど、私は絶対働く。」
-
-【参考例2:結婚式論】
-「結婚式に300万かけるの、マジで無駄だと思う。
-嫌われてもいいから言うけど、親族と会社の人呼んで、一生に一度の思い出作りって...その300万で新婚旅行3回行けるよ?
-『けじめ』とか『感謝を伝える場』って言うけど、それ本当に300万の価値ある?
-私の周り、式挙げた夫婦の半分は5年以内に離婚してるんだけど。
-SNS映えのために借金して、その後の生活カツカツって本末転倒。
-入籍だけして、家族で食事会したほうが絶対いい。
-古い世代は理解できないかもしれないけど、これが私たちの価値観。」
-
-【参考例3:マイホーム論】
-「20代で家買うやつ、正直理解できない。
-批判覚悟で言うけど、35年ローンって人生縛られすぎでしょ。
-転勤も転職もできない、子どもの学区も固定、災害リスクも全部背負う。
-『賃貸は家賃の無駄』って言うけど、持ち家も固定資産税、修繕費、金利で結局同じくらいかかるからね。
-私の先輩、家買った直後に会社倒産して、ローン払えず任意売却してた。
-人生何があるかわからないのに、固定費を最大化するって正気?
-賃貸で身軽に生きて、余った金で資産運用したほうが賢いと思う。」
-
-【重要な注意点】
-- 番号や見出し(「1.冒頭フック」など)は絶対に使わないこと
-- 自然な投稿文として完成させる
-- 参考例と全く同じ構成・表現にならないよう、テーマに応じて柔軟に構成する
-- ただし「極論→理由説明→具体例→締め」の流れは意識する
-- 必ず賛否が分かれる内容にすること
-
-【テーマ】{テーマ}
-
-【ターゲット】{ターゲット}
-
-上記の要素を自然に含めながら、読者を二分する極論型の投稿を作成してください。`
-},],    // バズ構文の置き場所
-    long: [],    // 長文投稿の置き場所
-    rewrite: []  // リライトの置き場所
-};
-
-// システム部分（ここはいじらなくてOK）
-let activePrompt = null;
-function showCategory(cat) {
-    document.getElementById('main-menu').classList.add('hidden');
-    document.getElementById('list-selection').classList.remove('hidden');
-    const grid = document.getElementById('prompt-grid');
-    grid.innerHTML = '';
-    prompts[cat].forEach(p => {
-        const item = document.createElement('div');
-        item.className = "p-8 bg-zinc-950 rounded-3xl border border-zinc-900 hover:border-zinc-400 cursor-pointer transition";
-        item.innerHTML = `<span class="font-bold text-lg">${p.name}</span>`;
-        item.onclick = () => openEditor(p);
-        grid.appendChild(item);
-    });
-}
-function openEditor(p) {
-    activePrompt = p;
-    document.getElementById('list-selection').classList.add('hidden');
-    document.getElementById('editor').classList.remove('hidden');
-    document.getElementById('edit-title').innerText = p.name;
-    const fDiv = document.getElementById('fields');
-    fDiv.innerHTML = '';
-    if (p.fields && p.fields.length > 0) {
-        p.fields.forEach(f => {
-            const input = document.createElement('input');
-            input.id = 'input-' + f;
-            input.placeholder = f + 'を入力...';
-            input.className = "w-full p-5 rounded-2xl text-lg mb-4";
-            fDiv.appendChild(input);
-        });
-    }
-}
-function copyFinal() {
-    let text = activePrompt.prompt;
-    if (activePrompt.fields) {
-        activePrompt.fields.forEach(f => {
-            const val = document.getElementById('input-' + f).value || `[${f}]`;
-            text = text.replace(new RegExp(`\\{${f}\\}`, 'g'), val);
-        });
-    }
-    navigator.clipboard.writeText(text);
-    const toast = document.getElementById('toast');
-    toast.style.opacity = '1';
-    setTimeout(() => toast.style.opacity = '0', 2000);
-}
-function goBack(target) {
-    document.getElementById('main-menu').classList.add('hidden');
-    document.getElementById('list-selection').classList.add('hidden');
-    document.getElementById('editor').classList.add('hidden');
-    document.getElementById(target).classList.remove('hidden');
-}
-</script>
+        function goBack(target) {
+            document.getElementById('main-menu').classList.add('hidden-content');
+            document.getElementById('list-selection').classList.add('hidden');
+            document.getElementById('editor').classList.add('hidden');
+            if(target === 'main-menu') {
+                document.getElementById('main-menu').classList.remove('hidden-content');
+            } else {
+                document.getElementById(target).classList.remove('hidden');
+            }
+        }
+    </script>
 </body>
 </html>
