@@ -6,62 +6,56 @@
     <title>Threads投稿プロンプト</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <style>
-        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@900&display=swap');
-        body { background-color: #000; color: #fff; font-family: 'Inter', sans-serif; overflow: hidden; }
-        .font-black-italic { font-weight: 900; font-style: italic; letter-spacing: -0.02em; }
-        .glass-card { background: #0a0a0a; border: 1px solid #1a1a1a; transition: all 0.3s ease; }
-        .glass-card:hover { border-color: #fff; background: #111; }
-        input { background: #000 !important; color: #fff !important; border: 1px solid #222 !important; text-align: center; }
-        input:focus { border-color: #fff !important; outline: none; }
+        body { background-color: #fcfcfc; color: #1a1a1a; font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif; }
+        .tab-active { border-bottom: 2px solid #000; color: #000; font-weight: bold; }
         .hidden-content { display: none; }
-        ::-webkit-scrollbar { width: 0px; }
+        .card { background: #fff; border: 1px solid #efefef; transition: all 0.2s; }
+        .card:hover { border-color: #ccc; }
+        input { border: 1px solid #ddd !important; padding: 12px; border-radius: 4px; }
+        input:focus { border-color: #000 !important; outline: none; }
     </style>
 </head>
-<body class="flex items-center justify-center min-h-screen">
+<body>
 
-    <div id="auth-screen" class="w-full max-w-sm p-8 text-center">
-        <h1 class="text-xl font-black-italic mb-12 tracking-[0.2em] uppercase">THREADS PROMPT SYSTEM</h1>
-        <input type="password" id="pass-input" class="w-full p-4 rounded-none mb-6 tracking-[1em]" placeholder="••••••">
-        <button onclick="checkPass()" class="w-full bg-white text-black py-4 font-black uppercase text-xs tracking-widest hover:bg-zinc-200 transition">Unlock</button>
-        <p id="error-msg" class="text-red-600 text-[10px] mt-4 opacity-0 tracking-widest">ACCESS DENIED</p>
+    <div id="auth-screen" class="flex items-center justify-center min-h-screen">
+        <div class="w-full max-w-sm p-10 text-center bg-white border border-gray-100 shadow-sm">
+            <h1 class="text-sm font-bold mb-10 tracking-[0.3em] uppercase">Threads投稿プロンプト</h1>
+            <input type="password" id="pass-input" class="w-full mb-6 text-center" placeholder="パスワードを入力">
+            <button onclick="checkPass()" class="w-full bg-black text-white py-4 text-xs font-bold tracking-widest hover:bg-gray-800 transition">LOGIN</button>
+        </div>
     </div>
 
-    <div id="main-content" class="hidden-content w-full max-w-5xl p-6">
-        
-        <div id="main-menu" class="grid grid-cols-1 md:grid-cols-3 gap-6">
-            <div onclick="showCategory('buzz')" class="glass-card p-16 cursor-pointer text-center group">
-                <h2 class="text-2xl font-black-italic uppercase tracking-tighter mb-2">バズ構文</h2>
-                <div class="w-8 h-[1px] bg-zinc-800 mx-auto group-hover:w-16 transition-all"></div>
-            </div>
-            <div onclick="showCategory('long')" class="glass-card p-16 cursor-pointer text-center group">
-                <h2 class="text-2xl font-black-italic uppercase tracking-tighter mb-2">長文投稿</h2>
-                <div class="w-8 h-[1px] bg-zinc-800 mx-auto group-hover:w-16 transition-all"></div>
-            </div>
-            <div onclick="showCategory('rewrite')" class="glass-card p-16 cursor-pointer text-center group">
-                <h2 class="text-2xl font-black-italic uppercase tracking-tighter mb-2">リライト投稿</h2>
-                <div class="w-8 h-[1px] bg-zinc-800 mx-auto group-hover:w-16 transition-all"></div>
-            </div>
-        </div>
+    <div id="main-content" class="hidden-content min-h-screen">
+        <header class="bg-white border-b border-gray-100 py-6 text-center sticky top-0 z-20">
+            <h1 class="text-base font-bold tracking-tight">Threads投稿プロンプト</h1>
+        </header>
 
-        <div id="list-selection" class="hidden w-full max-w-3xl mx-auto">
-            <button onclick="goBack('main-menu')" class="text-zinc-600 hover:text-white mb-10 font-black italic tracking-widest text-[10px]">← BACK TO MENU</button>
-            <div id="prompt-grid" class="grid grid-cols-1 gap-4"></div>
-        </div>
+        <nav class="flex justify-center bg-white border-b border-gray-100 sticky top-[65px] z-10">
+            <button id="btn-buzz" onclick="showCategory('buzz')" class="px-8 py-4 text-xs text-gray-400 tab-active tracking-widest">バズ構文</button>
+            <button id="btn-long" onclick="showCategory('long')" class="px-8 py-4 text-xs text-gray-400 tracking-widest">長文投稿</button>
+            <button id="btn-rewrite" onclick="showCategory('rewrite')" class="px-8 py-4 text-xs text-gray-400 tracking-widest">リライト投稿</button>
+        </nav>
 
-        <div id="editor" class="hidden w-full max-w-2xl mx-auto glass-card p-10">
-            <button onclick="goBack('list-selection')" class="text-zinc-600 hover:text-white mb-8 font-black italic tracking-widest text-[10px]">← BACK TO LIST</button>
-            <h2 id="edit-title" class="text-3xl font-black-italic mb-2 uppercase"></h2>
-            <p id="edit-desc" class="text-zinc-500 text-[10px] mb-10 tracking-widest uppercase"></p>
-            <div id="fields" class="space-y-4"></div>
-            <button onclick="copyFinal()" class="w-full mt-10 bg-white text-black py-5 font-black text-sm uppercase tracking-widest hover:bg-zinc-200 transition">Copy Prompt</button>
-            <p id="toast" class="text-center mt-4 text-zinc-500 font-bold opacity-0 transition text-[10px] tracking-widest">COPIED TO CLIPBOARD</p>
-        </div>
+        <main class="max-w-xl mx-auto p-6">
+            <div id="list-area" class="space-y-4"></div>
 
+            <div id="editor-area" class="hidden-content bg-white p-10 border border-gray-100">
+                <button onclick="backToList()" class="text-[10px] text-gray-400 mb-8 hover:text-black tracking-widest font-bold">← BACK TO LIST</button>
+                <h2 id="edit-title" class="text-xl font-bold mb-2"></h2>
+                <p id="edit-desc" class="text-xs text-gray-400 mb-10 leading-relaxed"></p>
+                <div id="fields-container" class="space-y-6"></div>
+                <button onclick="copyToClipboard()" class="w-full mt-12 bg-black text-white py-5 text-xs font-bold tracking-widest hover:bg-gray-800 transition">COPY PROMPT</button>
+                <p id="copy-msg" class="text-center mt-6 text-gray-900 font-bold opacity-0 transition text-[10px] tracking-widest uppercase">Copied!</p>
+            </div>
+        </main>
     </div>
 
     <script>
         const PASS = "mikann";
-        const prompts = { buzz: [{
+        
+        // ここにあなたが貼るプロンプトを一つずつ追加していきます
+        const prompts = {
+            buzz: [{
     id: 1,
     name: "逆張り",
     desc: "世間一般の常識を真っ向から否定し、論理的な説明と具体例で納得させる",
@@ -121,10 +115,6 @@
 
 私も『励まし=頑張れ』って思って、テスト前の息子に毎日言ってたんですよ。
 
-子どもに『頑張れ』って言うのは逆効果だって知ってました?
-
-私も『励まし=頑張れ』って思って、テスト前の息子に毎日言ってたんですよ。
-
 でもどんどん成績が下がって、勉強嫌いになって。
 
 スクールカウンセラーに相談したら『頑張れは子どもにプレッシャーを与えるだけ』って言われました。
@@ -147,7 +137,8 @@
 【ターゲット】{ここにターゲット層を入力}
 
 上記の要素を自然に含めながら、常識を破壊する体験談型の投稿を作成してください。`
-},], long: [{
+},],
+            long: [{
     id: 1,
     name: "有益・ノウハウ系",
     desc: "具体的なやり方・コツ・ノウハウを教えたい時。読者に「これ使える!」と思わせて保存させたい投稿。",
@@ -240,7 +231,8 @@
 □ でも馴れ馴れしすぎない距離感
 □ 失敗や弱さを隠していない
 □ 一方的ではなく、対話的な雰囲気`
-},], rewrite: [{
+},],
+            rewrite: [{
     id: 1,
     name: "バズ設計リライト",
     desc: "バズった投稿を別テーマで生成してくれる。バズ投稿の「DNA移植」用。元ポストの文字数・リズム・感情の波を±10%の精度で解析し、別ジャンルへクローン生成する。",
@@ -289,75 +281,97 @@
 ・中身じゃなく「型」だけ見る
 ・数字は正確に
 ・自然な日本語にする`
-},] };
+},]
+        };
+
+        let currentCategory = 'buzz';
         let activePrompt = null;
 
         function checkPass() {
-            if (document.getElementById('pass-input').value === PASS) {
+            const val = document.getElementById('pass-input').value;
+            if (val === PASS) {
                 document.getElementById('auth-screen').classList.add('hidden-content');
                 document.getElementById('main-content').classList.remove('hidden-content');
+                showCategory('buzz');
             } else {
-                const err = document.getElementById('error-msg');
-                err.style.opacity = '1';
-                setTimeout(() => err.style.opacity = '0', 2000);
+                alert("パスワードが違います");
             }
         }
 
         function showCategory(cat) {
-            document.getElementById('main-menu').classList.add('hidden-content');
-            document.getElementById('list-selection').classList.remove('hidden');
-            const grid = document.getElementById('prompt-grid');
-            grid.innerHTML = '';
+            currentCategory = cat;
+            activePrompt = null;
+            
+            ['buzz', 'long', 'rewrite'].forEach(c => {
+                document.getElementById('btn-' + c).classList.remove('tab-active');
+            });
+            document.getElementById('btn-' + cat).classList.add('tab-active');
+
+            document.getElementById('list-area').classList.remove('hidden-content');
+            document.getElementById('editor-area').classList.add('hidden-content');
+
+            const listArea = document.getElementById('list-area');
+            listArea.innerHTML = '';
+
+            if (prompts[cat].length === 0) {
+                listArea.innerHTML = '<p class="text-center text-gray-300 text-xs mt-20 tracking-widest">NO DATA</p>';
+                return;
+            }
+
             prompts[cat].forEach(p => {
-                const item = document.createElement('div');
-                item.className = "p-6 bg-[#050505] border border-[#111] hover:border-zinc-500 cursor-pointer transition";
-                item.innerHTML = `
-                    <div class="text-zinc-700 text-[9px] font-mono mb-1 tracking-widest">NO.${p.id}</div>
-                    <div class="font-black text-lg uppercase tracking-tight">${p.name}</div>
+                const div = document.createElement('div');
+                div.className = "card p-8 cursor-pointer";
+                div.innerHTML = `
+                    <div class="text-[9px] text-gray-300 font-bold mb-2 tracking-[0.2em]">NO.${p.id}</div>
+                    <h3 class="font-bold text-base tracking-tight">${p.name}</h3>
+                    <p class="text-xs text-gray-400 mt-3 leading-relaxed">${p.desc}</p>
                 `;
-                item.onclick = () => openEditor(p);
-                grid.appendChild(item);
+                div.onclick = () => openEditor(p);
+                listArea.appendChild(div);
             });
         }
 
         function openEditor(p) {
             activePrompt = p;
-            document.getElementById('list-selection').classList.add('hidden');
-            document.getElementById('editor').classList.remove('hidden');
+            document.getElementById('list-area').classList.add('hidden-content');
+            document.getElementById('editor-area').classList.remove('hidden-content');
+            
             document.getElementById('edit-title').innerText = p.name;
             document.getElementById('edit-desc').innerText = p.desc;
-            const fDiv = document.getElementById('fields');
-            fDiv.innerHTML = '';
-            if (p.fields) {
+            
+            const container = document.getElementById('fields-container');
+            container.innerHTML = '';
+            
+            if (p.fields && p.fields.length > 0) {
                 p.fields.forEach(f => {
                     const input = document.createElement('input');
-                    input.id = 'input-' + f;
+                    input.id = 'f-' + f;
                     input.placeholder = f;
-                    input.className = "w-full p-4 rounded-none text-xs tracking-widest";
-                    fDiv.appendChild(input);
+                    input.className = "w-full text-xs tracking-widest";
+                    container.appendChild(input);
                 });
+            } else {
+                container.innerHTML = '<p class="text-[10px] text-gray-300 tracking-widest text-center">入力項目はありません。そのままコピーしてください。</p>';
             }
         }
 
-        function copyFinal() {
+        function backToList() {
+            showCategory(currentCategory);
+        }
+
+        function copyToClipboard() {
             let text = activePrompt.prompt;
             if (activePrompt.fields) {
                 activePrompt.fields.forEach(f => {
-                    const val = document.getElementById('input-' + f).value || `{${f}}`;
+                    const val = document.getElementById('f-' + f).value || `{${f}}`;
                     text = text.replace(new RegExp(`\\{${f}\\}`, 'g'), val);
                 });
             }
+            
             navigator.clipboard.writeText(text);
-            const toast = document.getElementById('toast');
-            toast.style.opacity = '1';
-            setTimeout(() => toast.style.opacity = '0', 2000);
-        }
-
-        function goBack(target) {
-            document.getElementById('main-menu').classList.add('hidden-content');
-            document.getElementById('list-selection').classList.add('hidden');
-            document.getElementById('editor').classList.add('hidden');
-            document.getElementById(target).classList.remove('hidden');
+            const msg = document.getElementById('copy-msg');
+            msg.style.opacity = '1';
+            setTimeout(() => msg.style.opacity = '0', 2000);
         }
     </script>
 </body>
